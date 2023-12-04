@@ -4,10 +4,10 @@
 #
 # This config can be saved to its default location with:
 #   kwctl scaffold artifacthub > artifacthub-pkg.yml 
-version: v0.0.1
+version: 0.0.1
 name: crossplane-sql
 displayName: DOT SQL
-createdAt: 2023-12-04T17:40:16.769042Z
+createdAt: 2023-12-04T18:18:23.974895Z
 description: Kubewarden Policies for dot-sql Crossplane Compositions
 license: Apache-2.0
 homeURL: https://github.com/vfarcic/kubewarden-crossplane-sql

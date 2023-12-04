@@ -1,0 +1,48 @@
+{
+  "uid": "1299d386-525b-4032-98ae-1949f69f9cfc",
+  "kind": {
+    "group": "devopstoolkitseries.com",
+    "kind": "SQLClaim",
+    "version": "v1alpha1"
+  },
+  "resource": {
+    "group": "devopstoolkitseries.com",
+    "version": "v1alpha1",
+    "resource": "sqlclaims"
+  },
+  "requestKind": {
+    "group": "devopstoolkitseries.com",
+    "version": "v1alpha1",
+    "kind": "SQLClaim"
+  },
+  "requestResource": {
+    "group": "devopstoolkitseries.com",
+    "version": "v1alpha1",
+    "resource": "sqlclaims"
+  },
+  "name": "my-db",
+  "namespace": "production",
+  "operation": "CREATE",
+  "userInfo": {
+    "username": "kubernetes-admin",
+    "groups": [
+      "system:masters",
+      "system:authenticated"
+    ]
+  },
+  "object": {
+    "apiVersion": "devopstoolkitseries.com/v1alpha1",
+    "kind": "SQLClaim",
+    "metadata": {
+      "name": "my-db",
+      "namespace": "production"
+    },
+    "spec": {
+      "id": "my-db",
+      "parameters": {
+        "version": "14",
+        "size": "small"
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TODO: Rewrite
 func TestParsingSettingsWithNoValueProvided(t *testing.T) {
 	rawSettings := []byte(`{}`)
 	settings := &Settings{}
@@ -12,7 +13,7 @@ func TestParsingSettingsWithNoValueProvided(t *testing.T) {
 		t.Errorf("Unexpected error %+v", err)
 	}
 
-	if len(settings.DeniedNames) != 0 {
+	if len(settings.AllowedSizes) != 0 {
 		t.Errorf("Expected DeniedNames to be empty")
 	}
 
@@ -25,16 +26,17 @@ func TestParsingSettingsWithNoValueProvided(t *testing.T) {
 	}
 }
 
-func TestIsNameDenied(t *testing.T) {
+func TestIsSizeDenied(t *testing.T) {
 	settings := Settings{
-		DeniedNames: []string{"bob"},
+		AllowedSizes: []string{"medium", "large"},
 	}
-
-	if !settings.IsNameDenied("bob") {
-		t.Errorf("name should be denied")
+	if settings.IsSizeAllowed("small") {
+		t.Errorf("size should be denied")
 	}
-
-	if settings.IsNameDenied("alice") {
-		t.Errorf("name should not be denied")
+	if !settings.IsSizeAllowed("medium") {
+		t.Errorf("size should not be allowed")
+	}
+	if !settings.IsSizeAllowed("large") {
+		t.Errorf("size should not be allowed")
 	}
 }

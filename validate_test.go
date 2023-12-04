@@ -4,22 +4,46 @@ import (
 	"encoding/json"
 	"testing"
 
-	corev1 "github.com/kubewarden/k8s-objects/api/core/v1"
 	metav1 "github.com/kubewarden/k8s-objects/apimachinery/pkg/apis/meta/v1"
 	kubewarden_protocol "github.com/kubewarden/policy-sdk-go/protocol"
 	kubewarden_testing "github.com/kubewarden/policy-sdk-go/testing"
 )
 
-func TestEmptySettingsLeadsToApproval(t *testing.T) {
+var sqlTestObject = Sql{
+	APIVersion: "devopstoolkitseries.com/v1alpha1",
+	Kind:       "Sql",
+	Metadata: &metav1.ObjectMeta{
+		Name:      "my-db",
+		Namespace: "production",
+	},
+	Spec: &SqlSpec{
+		ID: "my-db",
+		Parameters: SqlSpecParameters{
+			Version: "14",
+			Size:    "medium",
+		},
+	},
+}
+
+func TestEmptySizeLeadsToApproval(t *testing.T) {
 	settings := Settings{}
-	pod := corev1.Pod{
+	sql := Sql{
+		APIVersion: "devopstoolkitseries.com/v1alpha1",
+		Kind:       "Sql",
 		Metadata: &metav1.ObjectMeta{
-			Name:      "test-pod",
-			Namespace: "default",
+			Name:      "my-db",
+			Namespace: "production",
+		},
+		Spec: &SqlSpec{
+			ID: "my-db",
+			Parameters: SqlSpecParameters{
+				Version: "14",
+				Size:    "medium",
+			},
 		},
 	}
 
-	payload, err := kubewarden_testing.BuildValidationRequest(&pod, &settings)
+	payload, err := kubewarden_testing.BuildValidationRequest(&sql, &settings)
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
 	}
@@ -34,23 +58,17 @@ func TestEmptySettingsLeadsToApproval(t *testing.T) {
 		t.Errorf("Unexpected error: %+v", err)
 	}
 
-	if response.Accepted != true {
+	if !response.Accepted {
 		t.Errorf("Unexpected rejection: msg %s - code %d", *response.Message, *response.Code)
 	}
 }
 
 func TestApproval(t *testing.T) {
 	settings := Settings{
-		DeniedNames: []string{"foo", "bar"},
-	}
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      "test-pod",
-			Namespace: "default",
-		},
+		AllowedSizes: []string{"medium", "large"},
 	}
 
-	payload, err := kubewarden_testing.BuildValidationRequest(&pod, &settings)
+	payload, err := kubewarden_testing.BuildValidationRequest(&sqlTestObject, &settings)
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
 	}
@@ -65,18 +83,18 @@ func TestApproval(t *testing.T) {
 		t.Errorf("Unexpected error: %+v", err)
 	}
 
-	if response.Accepted != true {
+	if !response.Accepted {
 		t.Error("Unexpected rejection")
 	}
 }
 
-func TestApproveFixture(t *testing.T) {
+func TestApproveFixtureDenied(t *testing.T) {
 	settings := Settings{
-		DeniedNames: []string{},
+		AllowedSizes: []string{"medium", "large"},
 	}
 
 	payload, err := kubewarden_testing.BuildValidationRequestFromFixture(
-		"test_data/pod.json",
+		"test_data/sql.json",
 		&settings)
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
@@ -92,24 +110,18 @@ func TestApproveFixture(t *testing.T) {
 		t.Errorf("Unexpected error: %+v", err)
 	}
 
-	if response.Accepted != true {
+	if response.Accepted {
 		t.Error("Unexpected rejection")
 	}
 }
 
-func TestRejectionBecauseNameIsDenied(t *testing.T) {
+func TestRejectionBecauseSizeIsDenied(t *testing.T) {
 	settings := Settings{
-		DeniedNames: []string{"foo", "test-pod"},
+		AllowedSizes: []string{"medium", "large"},
 	}
-
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      "test-pod",
-			Namespace: "default",
-		},
-	}
-
-	payload, err := kubewarden_testing.BuildValidationRequest(&pod, &settings)
+	sql := sqlTestObject
+	sql.Spec.Parameters.Size = "small"
+	payload, err := kubewarden_testing.BuildValidationRequest(&sql, &settings)
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
 	}
@@ -128,10 +140,12 @@ func TestRejectionBecauseNameIsDenied(t *testing.T) {
 		t.Error("Unexpected approval")
 	}
 
-	expected_message := "The 'test-pod' name is on the deny list"
+	expected_message := "The 'my-db' name is on the deny list. The spec.parameters.size cannot be 'small'"
+
 	if response.Message == nil {
 		t.Errorf("expected response to have a message")
 	}
+
 	if *response.Message != expected_message {
 		t.Errorf("Got '%s' instead of '%s'", *response.Message, expected_message)
 	}

@@ -10,7 +10,7 @@ import (
 
 // Settings is the structure that describes the policy settings.
 type Settings struct {
-	DeniedNames []string `json:"denied_names"`
+	AllowedSizes []string `json:"allowed_sizes"`
 }
 
 // No special checks have to be done
@@ -18,13 +18,15 @@ func (s *Settings) Valid() (bool, error) {
 	return true, nil
 }
 
-func (s *Settings) IsNameDenied(name string) bool {
-	for _, deniedName := range s.DeniedNames {
-		if deniedName == name {
+func (s *Settings) IsSizeAllowed(size string) bool {
+	if len(s.AllowedSizes) == 0 {
+		return true
+	}
+	for _, allowedSize := range s.AllowedSizes {
+		if allowedSize == size {
 			return true
 		}
 	}
-
 	return false
 }
 

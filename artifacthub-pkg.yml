@@ -4,7 +4,7 @@
 #
 # This config can be saved to its default location with:
 #   kwctl scaffold artifacthub > artifacthub-pkg.yml 
-version: 0.0.1
+version: v0.0.1
 name: crossplane-sql
 displayName: DOT SQL
 createdAt: 2023-12-04T17:40:16.769042Z

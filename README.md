@@ -1,6 +1,6 @@
 # Kubewarden Policies for dot-sql Crossplane Compositions
 
-## Test
+## Test
 
 ```bash
 make test

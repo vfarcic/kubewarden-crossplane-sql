@@ -10,7 +10,7 @@ import (
 
 // Settings is the structure that describes the policy settings.
 type Settings struct {
-	AllowedSizes []string `json:"allowed_sizes"`
+	AllowedSizes []string `json:"allowedSizes"`
 }
 
 // No special checks have to be done

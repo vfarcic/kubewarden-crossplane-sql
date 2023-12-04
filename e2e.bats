@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 # @test "reject because name is on deny list" {
-#   run kwctl run annotated-policy.wasm -r test_data/sql.json --settings-json '{"allowed_sizes": ["meduim", "large"]}'
+#   run kwctl run annotated-policy.wasm -r test_data/sql.json --settings-json '{"allowedSizes": ["meduim", "large"]}'
 # 
 #   # this prints the output when one the checks below fails
 #   echo "output = ${output}"
